@@ -146,6 +146,20 @@ function draw_countries({ countries_svg, x, y, r, o }) {
     .attr("r", d => r(d.population[year_index]))
     .attr("stroke", d => o(d.region));
 
+  console.log(countries_svg);
+  console.log("===");
+  console.log(countries_svg.select("circle"));
+  console.log("===");
+  console.log(countries_svg.select("circle").transition(transition));
+  console.log("===");
+  console.log(
+    countries_svg
+      .select("circle")
+      .transition(transition)
+      .attr("cx", d => x(d.income[year_index]))
+  );
+  console.log("===");
+
   countries_svg.sort((a, b) => b.population - a.population);
 
   countries_svg
@@ -161,6 +175,8 @@ function draw_countries({ countries_svg, x, y, r, o }) {
   t_duration = 250;
 
   year_current_text.property("textContent", year_current);
+
+  //console.log(countries_svg.selectAll("g")[0]);
 
   return { countries_svg, x, y, r, o };
 }
