@@ -160,7 +160,7 @@ function draw_countries({ countries_svg, x, y, r, o }) {
 
   t_duration = 250;
 
-  year_current_text.property("value", year_current)
+  year_current_text.property("textContent", year_current);
 
   return { countries_svg, x, y, r, o };
 }

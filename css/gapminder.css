@@ -54,6 +54,7 @@ body {
   width: 30%;
 }
 #content {
+  position: relative;
   width: 65%;
 }
 #content svg {
@@ -159,6 +160,9 @@ input {
 
 #year-show {
   position: absolute;
-  top: 8px;
-  right: 16px;
+  top: 5%;
+  right: 5%;
+}
+#content {
+  position: relative;
 }
