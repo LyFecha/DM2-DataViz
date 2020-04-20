@@ -148,3 +148,17 @@ input {
 #reinitialize {
   width: 100%;
 }
+
+/* Assignement 2 CSS */
+#play:disabled,
+#pause:disabled {
+  background-color: #eee; /* Green */
+  border: #aaa;
+  color: #999;
+}
+
+#year-show {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+}

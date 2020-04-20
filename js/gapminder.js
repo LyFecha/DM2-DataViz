@@ -7,7 +7,8 @@ let section = d3.select("#content"),
   yaxis_button = d3.select("#y-axis-button"),
   play_button = d3.select("#play"),
   pause_button = d3.select("#pause"),
-  slider = d3.select("#year");
+  slider = d3.select("#year"),
+  year_current_text = d3.select("#year-show");
 
 /* display parameters */
 const radius = 20,
@@ -159,6 +160,8 @@ function draw_countries({ countries_svg, x, y, r, o }) {
 
   t_duration = 250;
 
+  year_current_text.property("value", year_current)
+
   return { countries_svg, x, y, r, o };
 }
 
@@ -176,17 +179,25 @@ function start_timer() {
     year_index = 0;
     slider.property("value", year_min);
   }
+  play_button.property("disabled", true);
+  pause_button.property("disabled", false);
 
   t = d3.interval(increment, time_pace); // timer
 }
 
-function pause_timer() {
+function stop_timer() {
   t.stop();
+  play_button.property("disabled", false);
+  pause_button.property("disabled", true);
+}
+
+function pause_timer() {
+  stop_timer();
 }
 
 function increment() {
   if (year_current === year_max) {
-    t.stop();
+    stop_timer();
   } else {
     year_current += 1;
     year_index = year_current - year_min;

@@ -43,7 +43,7 @@
           <span class="control-label">Years</span>
           <span class="control-unit">
             <button id="play">▷</button>
-            <button id="pause">||</button
+            <button id="pause" disabled>||</button
             ><!-- Q1.9.-->
             <span id="year-min" class="year-label">1950</span>
             <input
@@ -64,6 +64,7 @@
 
     <section id="content">
       <svg id="my_graph">
+        <text id="year-show" x=0 y=0></text>
         <g id="y-axis"></g>
         <g id="x-axis"></g>
         <g id="countries"></g>
