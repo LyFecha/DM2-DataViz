@@ -138,6 +138,8 @@ function draw_countries({ countries_svg, x, y, r, o }) {
 
   countries_svg.transition(transition).attr("fill", d => o(d.region));
 
+  countries_svg.select("g.selected").transition(transition);
+
   countries_svg
     .select("circle")
     .transition(transition)
@@ -145,20 +147,6 @@ function draw_countries({ countries_svg, x, y, r, o }) {
     .attr("cy", d => y(d[which_var][year_index]))
     .attr("r", d => r(d.population[year_index]))
     .attr("stroke", d => o(d.region));
-
-  console.log(countries_svg);
-  console.log("===");
-  console.log(countries_svg.select("circle"));
-  console.log("===");
-  console.log(countries_svg.select("circle").transition(transition));
-  console.log("===");
-  console.log(
-    countries_svg
-      .select("circle")
-      .transition(transition)
-      .attr("cx", d => x(d.income[year_index]))
-  );
-  console.log("===");
 
   countries_svg.sort((a, b) => b.population - a.population);
 
@@ -176,7 +164,22 @@ function draw_countries({ countries_svg, x, y, r, o }) {
 
   year_current_text.property("textContent", year_current);
 
-  //console.log(countries_svg.selectAll("g")[0]);
+  let line_test = d3.line()(
+    d3.zip(
+      countries_svg
+        .data()[0]
+        .income.slice(0, year_index + 1)
+        .map(elem => x(elem)),
+      countries_svg
+        .data()[0][which_var]
+        .slice(0, year_index + 1)
+        .map(elem => y(elem))
+    )
+  );
+  countries_svg
+    .select("path")
+    .attr("d", line_test)
+    .attr("stroke", "black");
 
   return { countries_svg, x, y, r, o };
 }
@@ -231,6 +234,7 @@ d3.json("data/countries.json").then(countries_json => {
     .data(countries_json)
     .join("g");
 
+  countries_svg.append("path");
   countries_svg.append("circle");
   countries_svg.append("text");
 
