@@ -30,7 +30,7 @@ let t_duration = 0,
 
 /* scale definition */
 
-const compute_scales = function (countries_svg) {
+const compute_scales = function(countries_svg) {
   let data = countries_svg.data();
 
   let xMax = d3.max(data.map(d => d.income).flat()),
@@ -89,8 +89,8 @@ function draw_yaxis({ countries_svg, x, y, r, o }) {
     which_var === "co2_emissions"
       ? "CO² Emissions (tons/year)"
       : which_var === "life_expectancy"
-        ? "Life Expectancy (years)"
-        : "Unknokwn variable :("
+      ? "Life Expectancy (years)"
+      : "Unknokwn variable :("
   );
 
   y_axis.call(d3.axisLeft().scale(y));
@@ -112,7 +112,7 @@ function draw_xaxis({ countries_svg, x, y, r, o }) {
     .attr("y", -3)
     .text(
       "Income per inhabitant at purchasing power parity " +
-      "(dollars, logarithmic scale)"
+        "(dollars, logarithmic scale)"
     );
 
   x_axis.call(
@@ -126,7 +126,7 @@ function draw_xaxis({ countries_svg, x, y, r, o }) {
     .attr("text-anchor", "beginning")
     .selectAll(".tick > text")
     .attr("dx", "-10")
-    .filter(function (d, i, nodes) {
+    .filter(function(d, i, nodes) {
       return i === nodes.length - 1;
     })
     .attr("text-anchor", "end")
@@ -139,6 +139,28 @@ function draw_countries({ countries_svg, x, y, r, o }) {
   countries_svg.transition(transition).attr("fill", d => o(d.region));
 
   countries_svg.select("g.selected").transition(transition);
+
+  const draw_line = d => {
+    let line_path = d3.line()(
+      d3.zip(
+        d.income
+          .slice(0, year_index + 1)
+          .map(elem => (isNaN(elem) ? margin : x(elem))),
+        d[which_var]
+          .slice(0, year_index + 1)
+          .map(elem => (isNaN(elem) ? height - margin : y(elem)))
+      )
+    );
+    return line_path;
+  };
+
+  countries_svg
+    .select("path") //g.selected
+    .attr("stroke", d => o(d.region))
+    .attr("fill", "none")
+    .attr("stroke-linejoin", "round")
+    .attr("stroke-linecap", "round")
+    .attr("d", d => draw_line(d));
 
   countries_svg
     .select("circle")
@@ -163,23 +185,6 @@ function draw_countries({ countries_svg, x, y, r, o }) {
   t_duration = 250;
 
   year_current_text.property("textContent", year_current);
-
-  let line_test = d3.line()(
-    d3.zip(
-      countries_svg
-        .data()[0]
-        .income.slice(0, year_index + 1)
-        .map(elem => x(elem)),
-      countries_svg
-        .data()[0][which_var]
-        .slice(0, year_index + 1)
-        .map(elem => y(elem))
-    )
-  );
-  countries_svg
-    .select("path")
-    .attr("d", line_test)
-    .attr("stroke", "black");
 
   return { countries_svg, x, y, r, o };
 }
@@ -234,9 +239,9 @@ d3.json("data/countries.json").then(countries_json => {
     .data(countries_json)
     .join("g");
 
-  countries_svg.append("path");
-  countries_svg.append("circle");
-  countries_svg.append("text");
+  countries_svg.append("path").raise();
+  countries_svg.append("circle").lower();
+  countries_svg.append("text").lower();
 
   container.dispatch("data_ready", {
     detail: countries_svg
@@ -245,13 +250,13 @@ d3.json("data/countries.json").then(countries_json => {
 
 /* subscriptions */
 
-container.on("data_ready", function () {
+container.on("data_ready", function() {
   let countries_svg = d3.event.detail;
   let detail = compute_scales(countries_svg);
   container.dispatch("scale_ready", { detail: detail });
 });
 
-container.on("scale_ready", function () {
+container.on("scale_ready", function() {
   let params = d3.event.detail;
   draw_xaxis(params);
   draw_yaxis(params);
@@ -259,7 +264,7 @@ container.on("scale_ready", function () {
   container.dispatch("countries_ready", { detail: detail });
 });
 
-container.on("countries_ready", function () {
+container.on("countries_ready", function() {
   let countries_svg = d3.event.detail;
   set_up_listeners(countries_svg);
 });
@@ -269,13 +274,13 @@ function set_up_listeners({ countries_svg, x, y, r, o }) {
   play_button.on("click", start_timer);
   pause_button.on("click", pause_timer);
 
-  slider.on("input", function () {
+  slider.on("input", function() {
     year_current = +slider.property("value");
     year_index = year_current - year_min;
     draw_countries({ countries_svg, x, y, r, o });
   });
 
-  yaxis_button.on("change", function () {
+  yaxis_button.on("change", function() {
     which_var = yaxis_button.property("value");
     let params = compute_scales(countries_svg);
 
