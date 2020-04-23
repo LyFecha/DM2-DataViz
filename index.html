@@ -38,13 +38,17 @@
           <select id="y-axis-button" class="control-unit">
             <option value="life_expectancy">Life expectancy</option>
             <option value="co2_emissions">CO² Emissions</option>
+            <!-- Q3 -->
+            <option value="none">None</option>
+            <!-- -->
           </select>
           <br />
           <span class="control-label">Years</span>
           <span class="control-unit">
             <button id="play">▷</button>
-            <button id="pause" disabled>||</button
-            ><!-- Q1.9.-->
+            <!-- Q1 -->
+            <button id="pause" disabled>||</button>
+            <!-- -->
             <span id="year-min" class="year-label">1950</span>
             <input
               id="year"
@@ -63,7 +67,9 @@
     </section>
 
     <section id="content">
+      <!-- Q2 -->
       <h2 id="year-show"></h2>
+      <!-- -->
       <svg id="my_graph">
         <g id="y-axis"></g>
         <g id="x-axis"></g>
@@ -79,8 +85,7 @@
       </p>
       <p>
         <strong>Data source:</strong>
-        <a href="https://www.gapminder.org/data">Gapminder</a
-        ><!-- Q1.10.-->
+        <a href="https://www.gapminder.org/data">Gapminder</a>
       </p>
     </footer>
 

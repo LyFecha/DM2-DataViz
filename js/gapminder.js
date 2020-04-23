@@ -8,7 +8,9 @@ let section = d3.select("#content"),
   play_button = d3.select("#play"),
   pause_button = d3.select("#pause"),
   slider = d3.select("#year"),
+  // Q2
   year_current_text = d3.select("#year-show");
+//
 
 /* display parameters */
 const radius = 20,
@@ -37,8 +39,15 @@ const compute_scales = function(countries_svg) {
     xMin = d3.min(data.map(d => d.income).flat()),
     yMax = d3.max(
       data
-        .map(d =>
-          which_var === "co2_emissions" ? d.co2_emissions : d.life_expectancy
+        .map(
+          d =>
+            which_var === "co2_emissions"
+              ? d.co2_emissions
+              : // Q3
+              which_var === "life_expectancy"
+              ? d.life_expectancy
+              : 0
+          //
         )
         .flat()
     ),
@@ -54,7 +63,9 @@ const compute_scales = function(countries_svg) {
     y: d3
       .scaleLinear()
       .domain([0, yMax])
-      .range([height - margin, margin])
+      // Q3
+      .range([height - margin, which_var === "none" ? height - margin : margin])
+      //
       .unknown(height - outer_margin - inner_margin / 2),
     r: d3
       .scaleSqrt()
@@ -88,9 +99,11 @@ function draw_yaxis({ countries_svg, x, y, r, o }) {
   y_label.text(
     which_var === "co2_emissions"
       ? "CO² Emissions (tons/year)"
-      : which_var === "life_expectancy"
+      : // Q3
+      which_var === "life_expectancy"
       ? "Life Expectancy (years)"
-      : "Unknokwn variable :("
+      : "None"
+    //
   );
 
   y_axis.call(d3.axisLeft().scale(y));
@@ -138,35 +151,53 @@ function draw_countries({ countries_svg, x, y, r, o }) {
 
   countries_svg.transition(transition).attr("fill", d => o(d.region));
 
-  countries_svg.select("g.selected").transition(transition);
-
+  // Q9 (The only way to render a SVG tag before another
+  // is by putting it before. So we made a group (g) with all
+  // the lines and we check if the country is selected)
   const draw_line = d => {
     let line_path = d3.line()(
       d3.zip(
         d.income
           .slice(0, year_index + 1)
           .map(elem => (isNaN(elem) ? margin : x(elem))),
-        d[which_var]
-          .slice(0, year_index + 1)
-          .map(elem => (isNaN(elem) ? height - margin : y(elem)))
+        !(which_var === "none")
+          ? d[which_var]
+              .slice(0, year_index + 1)
+              .map(elem => (isNaN(elem) ? height - margin : y(elem)))
+          : new Array(year_index + 1).fill(y(0))
       )
     );
     return line_path;
   };
 
-  countries_svg
-    .select("path") //g.selected
+  container
+    .selectAll("g#lines path")
+    .transition(transition)
+    .attr("d", "");
+
+  container
+    .selectAll("g#lines path")
+    .transition(transition)
+    .filter(d => {
+      let selected = countries_svg
+        .selectAll("g.selected circle")
+        .filter(d2 => d.name === d2.name);
+      return selected.size() > 0;
+    })
     .attr("stroke", d => o(d.region))
     .attr("fill", "none")
     .attr("stroke-linejoin", "round")
     .attr("stroke-linecap", "round")
     .attr("d", d => draw_line(d));
+  //
 
   countries_svg
     .select("circle")
     .transition(transition)
     .attr("cx", d => x(d.income[year_index]))
-    .attr("cy", d => y(d[which_var][year_index]))
+    // Q3
+    .attr("cy", d => y(!(which_var === "none") ? d[which_var][year_index] : 0))
+    //
     .attr("r", d => r(d.population[year_index]))
     .attr("stroke", d => o(d.region));
 
@@ -179,12 +210,16 @@ function draw_countries({ countries_svg, x, y, r, o }) {
       "x",
       d => x(d.income[year_index]) + r(d.population[year_index]) + spacing
     )
-    .attr("y", d => y(d[which_var][year_index]) + 5)
+    //Q3
+    .attr("y", d => y(!(which_var === "none") ? d[which_var][year_index] : 0))
+    //
     .text(d => d.name);
 
   t_duration = 250;
 
+  // Q2
   year_current_text.property("textContent", year_current);
+  //
 
   return { countries_svg, x, y, r, o };
 }
@@ -203,16 +238,20 @@ function start_timer() {
     year_index = 0;
     slider.property("value", year_min);
   }
+  // Q1
   play_button.property("disabled", true);
   pause_button.property("disabled", false);
+  //
 
   t = d3.interval(increment, time_pace); // timer
 }
 
 function stop_timer() {
   t.stop();
+  // Q1
   play_button.property("disabled", false);
   pause_button.property("disabled", true);
+  //
 }
 
 function pause_timer() {
@@ -239,9 +278,21 @@ d3.json("data/countries.json").then(countries_json => {
     .data(countries_json)
     .join("g");
 
-  countries_svg.append("path").raise();
-  countries_svg.append("circle").lower();
-  countries_svg.append("text").lower();
+  // Q9
+  container
+    .append("g")
+    .attr("id", "lines")
+    .selectAll("path")
+    .data(countries_json)
+    .join("path");
+  //
+
+  countries_svg.append("circle");
+  countries_svg.append("text");
+
+  // Q9
+  container.select("#lines").lower();
+  //
 
   container.dispatch("data_ready", {
     detail: countries_svg
@@ -284,7 +335,7 @@ function set_up_listeners({ countries_svg, x, y, r, o }) {
     which_var = yaxis_button.property("value");
     let params = compute_scales(countries_svg);
 
-    draw_countries(params);
     draw_yaxis(params);
+    draw_countries(params);
   });
 }

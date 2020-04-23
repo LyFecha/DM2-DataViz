@@ -151,18 +151,20 @@ input {
 }
 
 /* Assignement 2 CSS */
+
+/*Q1*/
 #play:disabled,
 #pause:disabled {
   background-color: #eee; /* Green */
   border: #aaa;
   color: #999;
 }
+/**/
 
+/*Q2*/
 #year-show {
   position: absolute;
   top: 5%;
   right: 5%;
 }
-#content {
-  position: relative;
-}
+/**/
